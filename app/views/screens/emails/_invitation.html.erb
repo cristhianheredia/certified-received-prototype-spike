@@ -1,0 +1,12 @@
+<div class="text-tool-ink">
+  <p class="text-xs text-tool-ink-muted">From: Certified Receipt &lt;no-reply@certifiedreceived.com&gt;</p>
+  <p class="mt-2 text-sm font-semibold"><%= email.subject %></p>
+  <div class="mt-4 rounded border border-tool-border bg-tool-surface p-4 text-sm space-y-3">
+    <p>Hi <%= scenario.seed[:recipient_name] %>,</p>
+    <p>A document was sent to you for certified receipt. To review and acknowledge it, use this invitation number on the recipient site:</p>
+    <p class="text-center text-lg font-mono font-semibold tracking-wide py-2 rounded bg-tool-surface-raised border border-tool-border">
+      <%= scenario.seed[:invitation_number] %>
+    </p>
+    <p class="text-xs text-tool-ink-muted">This is a prototype email. In the real product this piece is catalog-registered product content, not tooling.</p>
+  </div>
+</div>

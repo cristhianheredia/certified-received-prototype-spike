@@ -1,0 +1,123 @@
+<% content_for :title, "#{@screen.title} — review" %>
+
+<div
+  class="min-h-screen flex flex-col"
+  data-controller="tooling"
+  data-tooling-mobile-width-value="390"
+>
+  <header class="border-b border-tool-border px-6 py-3 flex items-center justify-between gap-4">
+    <div class="min-w-0">
+      <%= link_to "← Catalog", screens_path, class: "text-xs text-tool-ink-muted hover:underline" %>
+      <p class="mt-0.5 font-semibold truncate"><%= @screen.title %></p>
+    </div>
+
+    <div class="flex items-center gap-3 shrink-0">
+      <%# Control B — scenario selector. URL-per-scenario (bookmarkable): picking one navigates,
+          which re-renders this page AND the iframed product screen against the new seed. %>
+      <label class="text-xs text-tool-ink-muted">
+        Scenario
+        <select
+          class="ml-1 rounded border border-tool-border bg-tool-surface px-2 py-1 text-xs"
+          data-action="tooling#selectScenario"
+        >
+          <% @screen.scenarios.each_value do |scenario| %>
+            <option value="<%= screen_path(@screen.slug, scenario: scenario.slug) %>" <%= "selected" if scenario.slug == @scenario_slug %>>
+              <%= scenario.label %>
+            </option>
+          <% end %>
+        </select>
+      </label>
+
+      <%# Control A — device toggle. Real iframe, not a fixed-width div (Myylestone lesson,
+          spec §3): vw/vh and @media inside the frame resolve against the frame's own viewport. %>
+      <div class="flex rounded border border-tool-border overflow-hidden text-xs">
+        <button
+          type="button"
+          class="px-2.5 py-1 bg-tool-accent text-tool-surface"
+          data-tooling-target="mobileButton"
+          data-action="tooling#setMobile"
+        >Mobile</button>
+        <button
+          type="button"
+          class="px-2.5 py-1"
+          data-tooling-target="desktopButton"
+          data-action="tooling#setDesktop"
+        >Desktop</button>
+      </div>
+
+      <%# Control C — email/notification overlay trigger with badge. %>
+      <button
+        type="button"
+        class="relative rounded border border-tool-border px-2.5 py-1 text-xs"
+        data-action="tooling#openMail"
+        data-tooling-target="mailButton"
+        <%= "hidden" if @scenario.emails.empty? %>
+      >
+        Mail
+        <span
+          class="absolute -top-1.5 -right-1.5 rounded-full bg-tool-badge text-tool-surface text-[10px] leading-none px-1.5 py-0.5"
+          data-tooling-target="badge"
+        ><%= @scenario.emails.size %></span>
+      </button>
+    </div>
+  </header>
+
+  <p class="px-6 py-2 text-xs text-tool-ink-muted border-b border-tool-border bg-tool-surface-raised">
+    <%= @scenario.description %>
+  </p>
+
+  <div class="flex-1 flex items-start justify-center py-8 px-4 overflow-auto">
+    <iframe
+      src="<%= product_screen_path(@screen.slug, scenario: @scenario_slug) %>"
+      title="<%= @screen.title %> (<%= @scenario.label %>)"
+      class="w-full max-w-3xl h-[780px] border border-tool-border rounded-md bg-product-surface transition-[width] duration-150"
+      data-tooling-target="frame"
+    ></iframe>
+  </div>
+
+  <%# Overlay: independent layer above the browser view, not a navigation of the iframe below. %>
+  <div
+    class="hidden fixed inset-0 z-50 items-center justify-center bg-tool-ink/40 p-4"
+    data-tooling-target="overlay"
+    data-action="click->tooling#closeMailOnBackdrop"
+  >
+    <div class="w-full max-w-sm bg-tool-surface-raised border border-tool-border rounded-md shadow-lg overflow-hidden" data-tooling-target="overlayPanel">
+      <div class="flex items-center justify-between border-b border-tool-border px-4 py-2.5">
+        <p class="text-xs font-semibold uppercase tracking-wide text-tool-ink-muted">Inbox — <%= @scenario.seed[:recipient_name] %></p>
+        <button type="button" class="text-xs text-tool-ink-muted hover:text-tool-ink" data-action="tooling#closeMail">Close ✕</button>
+      </div>
+
+      <div data-tooling-target="mailList">
+        <ul class="divide-y divide-tool-border">
+          <% @scenario.emails.each do |email| %>
+            <li>
+              <button
+                type="button"
+                class="w-full text-left px-4 py-3 hover:bg-tool-surface"
+                data-action="tooling#openEmail"
+                data-email-id="<%= email.id %>"
+              >
+                <p class="text-sm font-medium"><%= email.subject %></p>
+                <p class="mt-0.5 text-xs text-tool-ink-muted line-clamp-2"><%= email.preview %></p>
+                <p class="mt-1 text-[11px] text-tool-ink-muted"><%= email.sent_at_label %></p>
+              </button>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <div class="hidden" data-tooling-target="mailReading">
+        <div class="flex items-center gap-2 border-b border-tool-border px-4 py-2">
+          <button type="button" class="text-xs text-tool-ink-muted hover:text-tool-ink" data-action="tooling#backToList">← Inbox</button>
+        </div>
+        <div class="p-4 max-h-[70vh] overflow-auto" data-tooling-target="mailReadingContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <% @scenario.emails.each do |email| %>
+    <template data-tooling-target="emailTemplate" data-email-id="<%= email.id %>">
+      <%= render "screens/emails/#{email.body_partial}", email: email, scenario: @scenario %>
+    </template>
+  <% end %>
+</div>

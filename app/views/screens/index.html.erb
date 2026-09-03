@@ -1,0 +1,25 @@
+<% content_for :title, "Screen catalog — Certified Receipt (review)" %>
+
+<div class="max-w-3xl mx-auto px-6 py-10">
+  <p class="text-xs uppercase tracking-wide text-tool-ink-muted">Review environment · not the product</p>
+  <h1 class="mt-1 text-2xl font-semibold">Screen catalog</h1>
+  <p class="mt-2 text-sm text-tool-ink-muted max-w-xl">
+    Every screen here is registered in <code>ScreenCatalog</code>. Open one to review it with the
+    device toggle, scenario selector, and email/notification overlay described in
+    <code>SPEC-prototype-review-environment.md</code>.
+  </p>
+
+  <ul class="mt-8 divide-y divide-tool-border border border-tool-border rounded-md bg-tool-surface-raised">
+    <% @screens.each do |screen| %>
+      <li class="p-5">
+        <%= link_to screen_path(screen.slug), class: "block group" do %>
+          <p class="font-semibold group-hover:underline"><%= screen.title %></p>
+          <p class="mt-1 text-sm text-tool-ink-muted"><%= screen.summary %></p>
+          <p class="mt-2 text-xs text-tool-ink-muted">
+            <%= pluralize(screen.scenarios.size, "scenario") %> · default: <%= screen.scenarios[screen.default_scenario].label %>
+          </p>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

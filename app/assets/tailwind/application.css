@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/*
+  Two token namespaces, on purpose (SPEC-prototype-review-environment.md §1.3, §6):
+  - --product-*  → the brand. Used only inside app/views/product/**.
+  - --tool-*     → the review/tooling chrome. Deliberately un-branded ("paper" neutral),
+                   so tooling can never be mistaken for the product being reviewed.
+  Nothing in this file is a literal hex/rgb value outside this @theme block — everything
+  downstream consumes these as classes (bg-product-surface, text-tool-ink, etc.).
+*/
+@theme {
+  --color-product-surface: oklch(99% 0.002 90);
+  --color-product-surface-raised: oklch(100% 0 0);
+  --color-product-ink: oklch(22% 0.02 260);
+  --color-product-ink-muted: oklch(48% 0.02 260);
+  --color-product-border: oklch(88% 0.01 260);
+  --color-product-brand: oklch(42% 0.14 255);
+  --color-product-brand-strong: oklch(32% 0.14 255);
+  --color-product-accent: oklch(70% 0.16 70);
+  --color-product-success: oklch(55% 0.14 150);
+  --color-product-danger: oklch(55% 0.19 25);
+
+  --color-tool-surface: oklch(97% 0 0);
+  --color-tool-surface-raised: oklch(100% 0 0);
+  --color-tool-ink: oklch(20% 0 0);
+  --color-tool-ink-muted: oklch(50% 0 0);
+  --color-tool-border: oklch(80% 0 0);
+  --color-tool-accent: oklch(60% 0 0);
+  --color-tool-badge: oklch(55% 0.2 25);
+
+  --font-tool-mono: "SFMono-Regular", "Menlo", monospace;
+}

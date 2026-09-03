@@ -1,0 +1,74 @@
+<% content_for :title, "Claim your document — Certified Receipt" %>
+
+<div class="min-h-screen flex flex-col" data-controller="claim-form">
+  <header class="px-5 pt-6 pb-4 border-b border-product-border">
+    <p class="text-xs font-semibold tracking-wide uppercase text-product-ink-muted">Certified Receipt</p>
+  </header>
+
+  <div class="flex-1 px-5 py-6" data-claim-form-target="pending">
+    <% case @scenario.seed[:state] %>
+    <% when :empty %>
+      <h1 class="text-xl font-semibold">Nothing waiting yet, <%= @scenario.seed[:recipient_name] %></h1>
+      <p class="mt-2 text-sm text-product-ink-muted">
+        When someone sends you a certified document, you'll get an email or SMS with an invitation
+        number — bring it here to claim it.
+      </p>
+
+    <% when :waiting, :in_progress %>
+      <h1 class="text-xl font-semibold">You have a document waiting</h1>
+      <p class="mt-2 text-sm text-product-ink-muted">
+        Check the email or SMS you received and type the invitation number below.
+      </p>
+
+      <%= form_with url: "#", method: :post, class: "mt-6 space-y-4", data: { claim_form_target: "form", action: "submit->claim-form#submit" } do %>
+        <div>
+          <label for="invitation_number" class="block text-sm font-medium">Invitation number</label>
+          <input
+            type="text"
+            id="invitation_number"
+            name="invitation_number"
+            autocomplete="off"
+            placeholder="CR-0000-XX0"
+            class="mt-1 w-full rounded-md border border-product-border bg-product-surface-raised px-3 py-2.5 text-base focus:outline-2 focus:outline-product-brand"
+          >
+          <p class="mt-1 text-xs text-product-ink-muted">Prototype note: any value is accepted here — this field does not validate yet.</p>
+        </div>
+        <button type="submit" class="w-full rounded-md bg-product-brand px-4 py-2.5 text-sm font-semibold text-product-surface hover:bg-product-brand-strong">
+          Claim document
+        </button>
+      <% end %>
+
+      <% if @scenario.seed[:state] == :in_progress %>
+        <div class="mt-8 rounded-md border border-product-border bg-product-surface-raised p-4">
+          <p class="text-sm font-medium">Reminder sent</p>
+          <p class="mt-1 text-xs text-product-ink-muted">We already nudged you once — the sender will see when you acknowledge.</p>
+        </div>
+      <% end %>
+
+    <% when :veteran %>
+      <h1 class="text-xl font-semibold">Welcome back, <%= @scenario.seed[:recipient_name] %></h1>
+      <p class="mt-2 text-sm text-product-ink-muted">
+        Your identity is already verified. Nothing new is waiting right now — your history is below.
+      </p>
+      <div class="mt-6 divide-y divide-product-border rounded-md border border-product-border bg-product-surface-raised">
+        <div class="px-4 py-3 text-sm">
+          <p class="font-medium">Service Affidavit — Lease Amendment</p>
+          <p class="text-xs text-product-ink-muted">Acknowledged · sealed</p>
+        </div>
+        <div class="px-4 py-3 text-sm">
+          <p class="font-medium">Service Affidavit — HOA Notice</p>
+          <p class="text-xs text-product-ink-muted">Acknowledged · sealed</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="hidden px-5 py-6" data-claim-form-target="success">
+    <div class="rounded-md border border-product-success bg-product-surface-raised p-5">
+      <p class="text-sm font-semibold text-product-success">Acknowledged</p>
+      <p class="mt-1 text-sm text-product-ink-muted">
+        You've taken receipt of this document knowingly. A Service Affidavit will be available once it's sealed.
+      </p>
+    </div>
+  </div>
+</div>
